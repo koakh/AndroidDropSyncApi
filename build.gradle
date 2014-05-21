@@ -1,0 +1,45 @@
+apply plugin: 'android'
+android {
+  compileSdkVersion 19
+  buildToolsVersion '19.0.3'
+  defaultConfig {
+    minSdkVersion 8
+    targetSdkVersion 15
+    versionCode 1
+    versionName "1.0"
+  }
+  buildTypes {
+    release {
+      runProguard false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+    }
+  }
+  signingConfigs {
+  }
+}
+dependencies {
+  //compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile 'com.android.support:appcompat-v7:19.+'
+  //DropBox Packed Native Libraries
+  //includes the JAR file from the SDK
+  compile files('libs/dropbox-sync-sdk-android.jar')
+  //includes the JAR file we just created by packaging up the native libraries.
+  compile files("$buildDir/native-libs/native-libs.jar")
+}
+
+repositories {
+}
+
+//DropBox: Packaging Native Libraries
+task nativeLibsToJar(type: Zip) {
+  destinationDir file("$buildDir/native-libs")
+  baseName 'native-libs'
+  extension 'jar'
+  from fileTree(dir: 'libs', include: '**/*.so')
+  into 'lib/'
+}
+
+tasks.withType(Compile) {
+  compileTask -> compileTask.dependsOn(nativeLibsToJar)
+}

@@ -85,7 +85,6 @@ public class MainActivity extends ActionBarActivity {
   @Override
   protected void onSaveInstanceState(Bundle savedInstanceState) {
     super.onSaveInstanceState(savedInstanceState);
-
     if (mApp.getDbx() != null && mApp.getDbx().getAccountManager().hasLinkedAccount())
     {
       savedInstanceState.putString("dbx_userid", mApp.getDbx().getAccountManager().getLinkedAccount().getUserId());

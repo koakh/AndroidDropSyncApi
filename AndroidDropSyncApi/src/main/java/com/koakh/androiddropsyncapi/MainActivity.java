@@ -86,13 +86,14 @@ public class MainActivity extends ActionBarActivity {
   protected void onSaveInstanceState(Bundle savedInstanceState) {
     super.onSaveInstanceState(savedInstanceState);
     //savedInstanceState.putString("dbx_userid", mApp.getDbx().getAccountManager().getLinkedAccount().getUserId());
+    Toast.makeText(this, "onSaveInstanceState", Toast.LENGTH_SHORT).show();
   }
 
   @Override
   protected void onRestoreInstanceState(Bundle savedInstanceState) {
     super.onRestoreInstanceState(savedInstanceState);
     //String dbx_userid = savedInstanceState.getString("dbx_userid");
-    //Log.i(mApp.TAG, String.format("dbx_userid: [%s]", dbx_userid));
+    Toast.makeText(this, "onRestoreInstanceState", Toast.LENGTH_SHORT).show();
   }
 
   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

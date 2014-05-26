@@ -14,14 +14,10 @@ import com.koakh.androiddropsyncapi.R;
 
 import java.io.IOException;
 
-/**
- * Created by mario on 19/05/2014.
- */
-
 public class Dbx {
 
   //Request Codes
-  private int REQUEST_LINK_TO_DBX = 0;//R.integer.REQUEST_LINK_TO_DBX;
+  private int REQUEST_LINK_TO_DBX;
 
   //Private Members
   private Activity mActivity;
@@ -29,51 +25,61 @@ public class Dbx {
   private Singleton mApp;
 
   //Public Members
-  private DbxAccountManager mDbxAcctMgr;
-  public DbxAccountManager getDbxAcctMgr() {
-    return mDbxAcctMgr;
+  private DbxAccountManager mAccountManager;
+
+  public DbxAccountManager getAccountManager() {
+    return mAccountManager;
   }
 
-  private DbxFileSystem mDbxFs;
-  public DbxFileSystem getDbxFs() {
-    return mDbxFs;
+  private DbxFileSystem mFileSystem;
+
+  public DbxFileSystem getFileSystem() {
+    if (mFileSystem.isShutDown()) InitFileSystem();
+    return mFileSystem;
   }
 
-  public Dbx(Activity pActivity, String pAppkey, String pAppSecret) {
+  //Constructor
+  public Dbx(Activity pActivity) {
+
     //Assign Parameters
     mActivity = pActivity;
     mContext = pActivity.getApplicationContext();
+
     //Get Singleton
     mApp = Singleton.getInstance();
+
+    //Get Request Codes
+    REQUEST_LINK_TO_DBX = mContext.getResources().getInteger(R.integer.REQUEST_LINK_TO_DBX);
+
     //Get Account Manager and init FileSystem
-    if (InitAccountManager(pAppkey, pAppSecret)) InitFileSystem();
+    InitAccountManager(
+      mContext.getResources().getString(R.string.dropbox_appkey),
+      mContext.getResources().getString(R.string.dropbox_appsecret)
+    );
   }
 
   //Util Methods
-  private boolean InitAccountManager(String pAppkey, String pAppSecret) {
+  private void InitAccountManager(String pAppKey, String pAppSecret) {
     try {
       //Linking accounts
-      mDbxAcctMgr = DbxAccountManager.getInstance(
-        mContext, mContext.getResources().getString(R.string.dropbox_appkey),
-        mContext.getResources().getString(R.string.dropbox_appsecret)
-      );
+      mAccountManager = DbxAccountManager.getInstance(mContext, pAppKey, pAppSecret);
 
-      //Returns whether this application is linked to a Dropbox account.
-      if (mDbxAcctMgr.hasLinkedAccount()) {
+      //I is linked to a DropBox account, Get FileSystem
+      if (mAccountManager.hasLinkedAccount()) {
         InitFileSystem();
+        //Else Request Link
       } else {
-        mDbxAcctMgr.startLink(mActivity, REQUEST_LINK_TO_DBX);
+        mAccountManager.startLink(mActivity, REQUEST_LINK_TO_DBX);
       }
-      return true;
     } catch (DbxAccountManager.ConfigurationMismatchException e) {
       Log.e(mApp.TAG, e.getMessage());
-      return false;
     }
   }
 
-  private void InitFileSystem() {
+  //Public Methods
+  public void InitFileSystem() {
     try {
-      mDbxFs = DbxFileSystem.forAccount(mDbxAcctMgr.getLinkedAccount());
+      mFileSystem = DbxFileSystem.forAccount(mAccountManager.getLinkedAccount());
     } catch (DbxException e) {
       Log.e(mApp.TAG, e.getMessage());
     }
@@ -81,19 +87,24 @@ public class Dbx {
 
   public boolean CreateTextFile(String pFile, String pContent) {
     try {
-      DbxFile testFile = mDbxFs.create(new DbxPath(pFile));
-      try {
-        testFile.writeString(pContent);
-      } catch (IOException e) {
-        e.printStackTrace();
-        return false;
-      } finally {
-        testFile.close();
-        return true;
+      DbxPath testPath = new DbxPath(DbxPath.ROOT, pFile);
+      if (!mFileSystem.exists(testPath)) {
+
+        DbxFile testFile = mFileSystem.create(testPath);
+        try {
+          testFile.writeString(pContent);
+          return true;
+        } catch (IOException e) {
+          e.printStackTrace();
+        } finally {
+          testFile.close();
+        }
+      } else {
+        Log.i(mApp.TAG, String.format("File %s Already Exists", testPath.getName()));
       }
     } catch (DbxException e) {
       Log.e(mApp.TAG, e.getMessage());
-      return false;
     }
+    return false;
   }
 }

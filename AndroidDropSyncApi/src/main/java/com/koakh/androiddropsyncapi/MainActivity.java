@@ -85,15 +85,17 @@ public class MainActivity extends ActionBarActivity {
   @Override
   protected void onSaveInstanceState(Bundle savedInstanceState) {
     super.onSaveInstanceState(savedInstanceState);
-    //savedInstanceState.putString("dbx_userid", mApp.getDbx().getAccountManager().getLinkedAccount().getUserId());
-    Toast.makeText(this, "onSaveInstanceState", Toast.LENGTH_SHORT).show();
+    if (mApp.getDbx() != null && mApp.getDbx().getAccountManager().hasLinkedAccount())
+    {
+      savedInstanceState.putString("dbx_userid", mApp.getDbx().getAccountManager().getLinkedAccount().getUserId());
+    }
   }
 
   @Override
   protected void onRestoreInstanceState(Bundle savedInstanceState) {
     super.onRestoreInstanceState(savedInstanceState);
-    //String dbx_userid = savedInstanceState.getString("dbx_userid");
-    Toast.makeText(this, "onRestoreInstanceState", Toast.LENGTH_SHORT).show();
+    String dbxUserId = savedInstanceState.getString("dbx_userid");
+    Toast.makeText(this, String.format("onRestoreInstanceState: dbxUserId=[%s]", dbxUserId), Toast.LENGTH_SHORT).show();
   }
 
   //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

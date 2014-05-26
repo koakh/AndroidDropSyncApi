@@ -16,8 +16,6 @@ public class MainActivity extends ActionBarActivity {
 
   //get App Singleton
   private Singleton mApp;
-  //Store Menu Reference
-  private Menu mMenu;
   //Store SubMenu References
   private MenuItem mMenuItemLink;
   private MenuItem mMenuItemUnlink;
@@ -124,12 +122,10 @@ public class MainActivity extends ActionBarActivity {
     // Inflate the menu; this adds items to the action bar if it is present.
     getMenuInflater().inflate(R.menu.main, menu);
 
-    //get reference for menu
-    this.mMenu = menu;
     //Get References
-    this.mMenuItemLink = mMenu.findItem(R.id.action_menu_link);
-    this.mMenuItemUnlink = mMenu.findItem(R.id.action_menu_unlink);
-    this.mMenuItemCreateFile = mMenu.findItem(R.id.action_menu_create_file);
+    this.mMenuItemLink = menu.findItem(R.id.action_menu_link);
+    this.mMenuItemUnlink = menu.findItem(R.id.action_menu_unlink);
+    this.mMenuItemCreateFile = menu.findItem(R.id.action_menu_create_file);
 
     UpdateMenu();
 
